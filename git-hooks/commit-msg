@@ -1,0 +1,123 @@
+#!/bin/sh
+
+# Get the current Git branch name
+full_branch_name=$(git rev-parse --abbrev-ref HEAD)
+
+# Extract the part of the branch name after the first "/"
+branch_name=$(echo "$full_branch_name" | sed 's:.*/::')
+
+# Get the commit message from the argument
+commit_message=$(cat "$1")
+
+# Bypass validation for merge commits
+case "$commit_message" in
+  Merge*)
+    exit 0
+    ;;
+esac
+
+# Define valid commit types and their corresponding emojis (sorted alphabetically)
+case "$commit_message" in
+  asset:*)
+    emoji="🍱"
+    ;;
+  build:*)
+    emoji="🏗"
+    ;;
+  chore:*)
+    emoji="🧹"
+    ;;
+  ci:*)
+    emoji="👷"
+    ;;
+  config:*)
+    emoji="🔧"
+    ;;
+  comment:*)
+    emoji="💡"
+    ;;
+  db:*)
+    emoji="🗃️"
+    ;;
+  del:*)
+    emoji="🔥"
+    ;;
+  dep_new:*)
+    emoji="➕"
+    ;;
+  dep_del:*)
+    emoji="➖"
+    ;;
+  dep_down:*)
+    emoji="📉"
+    ;;
+  dep_up:*)
+    emoji="📈"
+    ;;
+  dev:*)
+    emoji="👨‍💻"
+    ;;
+  doc:*)
+    emoji="📝"
+    ;;
+  feat:*)
+    emoji="✨"
+    ;;
+  fix:*)
+    emoji="🐛"
+    ;;
+  hotfix:*)
+    emoji="🚑️"
+    ;;
+  intl:*)
+    emoji="🌐"
+    ;;
+  lint:*)
+    emoji="🚨"
+    ;;
+  log:*)
+    emoji="🔊"
+    ;;
+  perf:*)
+    emoji="⚡️"
+    ;;
+  refac:*)
+    emoji="♻️"
+    ;;
+  responsive:*)
+    emoji="📱"
+    ;;
+  revert:*)
+    emoji="⏪"
+    ;;
+  role:*)
+    emoji="🛂"
+    ;;
+  style:*)
+    emoji="🎨"
+    ;;
+  tada:*)
+    emoji="🎉"
+    ;;
+  test:*)
+    emoji="🧪"
+    ;;
+  type:*)
+    emoji="🏷️"
+    ;;
+  wip:*)
+    emoji="🚧"
+    ;;
+  *)
+    # If the type is invalid, show an error and exit
+    echo "Error: Invalid commit type. Please use one of the following types: build, chore, ci, config, comment, db, del, dep_new, dep_del, dep_down, dep_up, dev, doc, feat, fix, hotfix, intl, log, perf, refac, responsive, revert, role, style, tada, test, type, and wip"
+    exit 1
+    ;;
+esac
+
+# Modify the commit message with emoji and branch name if the type is valid
+new_message="$emoji | ${commit_message%%:*}($branch_name):${commit_message#*:}"
+
+# Overwrite the commit message with the new format
+echo "$new_message" > "$1"
+
